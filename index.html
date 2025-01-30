@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monetag Earning Bot - Bangladesh Only</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            color: #00ff88;
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .progress-circle {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            border-radius: 50%;
+            background: conic-gradient(#00ff88 0%, rgba(0, 255, 136, 0.2) 0%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .progress-circle span {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        button {
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            color: #1a1a2e;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 136, 0.3);
+        }
+        .withdraw-section {
+            margin-top: 2rem;
+            display: none;
+        }
+        #withdraw-status {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        select, input {
+            padding: 0.8rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #00ff88;
+        }
+        .error {
+            color: #ff4444;
+        }
+        .success {
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>💰 Monetag Earning Bot</h1>
+            <p>Welcome, <span id="username">@EarningMaster</span></p>
+        </div>
+        <div class="stats">
+            <div class="stat-box">
+                <p>Watched Ads</p>
+                <h2 id="ads-count">0</h2>
+            </div>
+            <div class="stat-box">
+                <p>Earnings</p>
+                <h2>$<span id="earnings">0.00</span></h2>
+            </div>
+        </div>
+        <div class="progress-circle">
+            <span id="progress-text">0%</span>
+        </div>
+        <div class="controls">
+            <button id="watch-btn" onclick="watchAd()">🎥 Watch Ad (+$0.10)</button>
+            <button id="auto-btn" onclick="toggleAutoMode()">⚡ Auto Mode</button>
+            <button id="withdraw-btn" onclick="showWithdraw()">💸 Withdraw Earnings</button>
+        </div>
+        <div class="withdraw-section" id="withdraw-section">
+            <select id="method" class="form-input">
+                <option value="bkash">bKash</option>
+                <option value="nagad">Nagad</option>
+            </select>
+            <input type="number" id="amount" class="form-input" placeholder="Enter amount">
+            <button onclick="processWithdrawal()">Confirm Withdraw</button>
+            <div id="withdraw-status"></div>
+        </div>
+    </div>
+    <script>
+        // Check if user is from Bangladesh
+        const userCountry = getUserCountry();
+        if (userCountry !== "BD") {
+            document.body.innerHTML = `
+                <div style="color: #fff; text-align: center; margin-top: 20%;">
+                    <h1>⚠️ Access Denied</h1>
+                    <p>This service is only available for users in Bangladesh.</p>
+                </div>
+            `;
+        }
+
+        let adsWatched = 0;
+        let earnings = 0;
+        let autoMode = false;
+        let progress = 0;
+
+        function updateStats() {
+            document.getElementById('ads-count').textContent = adsWatched;
+            document.getElementById('earnings').textContent = earnings.toFixed(2);
+            document.querySelector('.progress-circle').style.background = 
+                `conic-gradient(#00ff88 ${progress}%, rgba(0, 255, 136, 0.2) ${progress}%)`;
+            document.getElementById('progress-text').textContent = `${progress}%`;
+        }
+
+        async function watchAd() {
+            // Integrate Monetag API here
+            document.getElementById('watch-btn').disabled = true;
+            
+            // Simulate ad watching
+            await new Promise(resolve => setTimeout(resolve, 3000));
+            
+            adsWatched++;
+            earnings += 0.10;
+            progress = (adsWatched % 10) * 10;
+            updateStats();
+            document.getElementById('watch-btn').disabled = false;
+        }
+
+        function toggleAutoMode() {
+            autoMode = !autoMode;
+            const btn = document.getElementById('auto-btn');
+            btn.textContent = autoMode ? '🛑 Stop Auto Mode' : '⚡ Auto Mode';
+            if(autoMode) autoAdHandler();
+        }
+
+        async function autoAdHandler() {
+            while(autoMode) {
+                await watchAd();
+                await new Promise(resolve => setTimeout(resolve, 5000));
+            }
+        }
+
+        function showWithdraw() {
+            const section = document.getElementById('withdraw-section');
+            section.style.display = earnings >= 5 ? 'block' : 'none';
+            if(earnings < 5) {
+                alert('Minimum withdrawal amount is $5.00');
+            }
+        }
+
+        async function processWithdrawal() {
+            const method = document.getElementById('method').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            if(amount > earnings) {
+                showStatus('Insufficient balance!', 'error');
+                return;
+            }
+
+            if(amount < 5) {
+                showStatus('Minimum withdrawal is $5.00!', 'error');
+                return;
+            }
+
+            showStatus('Processing withdrawal...', 'processing');
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            earnings -= amount;
+            updateStats();
+            showStatus(`Successfully withdrew $${amount.toFixed(2)} via ${method.toUpperCase()}!`, 'success');
+        }
+
+        function showStatus(message, type) {
+            const status = document.getElementById('withdraw-status');
+            status.textContent = message;
+            status.className = type === 'error' ? 'error' : 
+                               type === 'success' ? 'success' : '';
+        }
+
+        function getUserCountry() {
+            // Mock implementation of IP-based country detection
+            // Replace this with a real API call to detect user's country
+            return "BD"; // For testing purposes, assume user is from Bangladesh
+        }
+    </script>
+</body>
+</html>
