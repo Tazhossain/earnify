@@ -1,0 +1,2 @@
+# earnify
+earn cash
