@@ -1,35 +1,56 @@
-document.addEventListener("DOMContentLoaded", () => {
-    document.querySelector('meta[name="monetag"]').setAttribute("content", settings.monetag);
-    // Add any initialization logic here
-});
+let adInterval;
 
-function watchAd() {
+function handleAdAction() {
+    if(document.getElementById('watch-ad').checked) {
+        showAd().then(() => {
+            updateBalance(20);
+            document.getElementById('watch-ad').checked = false;
+        }).catch(() => {
+            alert('Failed to load ad');
+            document.getElementById('watch-ad').checked = false;
+        });
+    }
+}
+
+function showAd() {
+    return new Promise((resolve, reject) => {
+        // Implement actual ad display logic here
+        if(settings.monetag) {
+            // Example ad display logic
+            const adWindow = window.open(`https://example-ad-provider.com?tag=${settings.monetag}`, '_blank');
+            setTimeout(() => {
+                adWindow.close();
+                resolve();
+            }, 30000);
+        } else {
+            reject('No ad provider configured');
+        }
+    });
+}
+
+function updateBalance(amount) {
     const earningsElement = document.getElementById('earnings');
-    let balance = parseInt(earningsElement.textContent) || 0;
+    const current = parseFloat(earningsElement.textContent);
+    const newBalance = current + amount;
     
-    // Add visual feedback
-    earningsElement.classList.add('pulse');
-    setTimeout(() => earningsElement.classList.remove('pulse'), 200);
+    earningsElement.textContent = newBalance.toFixed(2);
+    updateProgress(newBalance);
     
-    // Update balance
-    balance += 20;
-    earningsElement.textContent = balance;
-    
-    // Add to watched ads count
+    // Update watched ads count
     const adsCount = document.getElementById('ads-count');
     adsCount.textContent = parseInt(adsCount.textContent) + 1;
 }
 
-function showWithdrawSection() {
-    // Implement proper withdrawal UI instead of alert
-    const minimum = 1000;
-    const current = parseInt(document.getElementById('earnings').textContent);
-    
-    if (current < minimum) {
-        alert(`Minimum withdrawal amount is ${minimum} coins. Keep earning!`);
+function updateProgress(balance) {
+    const progress = (balance % 1000) / 10;
+    document.querySelector('.progress-bar').style.width = `${progress}%`;
+}
+
+function handleWithdraw() {
+    const balance = parseFloat(document.getElementById('earnings').textContent);
+    if(balance < 1000) {
+        alert(`Minimum withdrawal is 1000 points. Current: ${balance.toFixed(2)}`);
         return;
     }
-    
-    // Add proper withdrawal form here
-    alert("Withdrawal system coming soon!");
+    Telegram.WebApp.showAlert(`Withdrawal request for ${balance.toFixed(2)} points submitted!`);
 }
