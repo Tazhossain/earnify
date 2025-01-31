@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="monetag" content="">
-    <title>Earnify - Telegram Earn Bot</title>
+    <title>Auto MoneTag Ads</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="config.js"></script>
@@ -12,9 +12,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <img id="user-profile-pic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
-                 class="profile-pic" alt="Profile">
-            <div>
+            <img id="user-profile-pic" src="placeholder.png" class="profile-pic" alt="Profile">
+            <div class="user-info">
                 <h1>Auto MoneTag Ads</h1>
                 <p>Welcome, <span id="username">@user</span></p>
             </div>
@@ -27,7 +26,7 @@
             </div>
             <div class="stat-box">
                 <p>Earned Points</p>
-                <h2><span id="earnings">0.00</span></h2>
+                <h2 id="earnings">0.00</h2>
             </div>
         </div>
 
@@ -38,17 +37,12 @@
         <div class="actions">
             <label class="action-item">
                 <input type="checkbox" id="watch-ad" onclick="handleAdAction()">
-                <span>Watch Ad</span>
+                <span>📺 Watch Ad</span>
             </label>
             
             <label class="action-item">
-                <input type="checkbox" id="auto-ads">
-                <span>Auto Show Ads</span>
-            </label>
-
-            <label class="action-item">
-                <input type="checkbox" id="stop-ads">
-                <span>Stop Auto Ads</span>
+                <input type="checkbox" id="auto-ads" onclick="toggleAutoAds()">
+                <span>⚡ Auto Show Ads</span>
             </label>
 
             <button class="withdraw-btn" onclick="handleWithdraw()">
