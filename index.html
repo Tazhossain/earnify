@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earnify - Earn Money</title>
+    <title>Earnify - Bangladesh Only</title>
     <style>
         * {
             box-sizing: border-box;
@@ -93,7 +93,7 @@
         }
         .withdraw-section {
             margin-top: 2rem;
-            display: none;
+            display: block;
         }
         #withdraw-status {
             margin-top: 1rem;
@@ -120,13 +120,30 @@
         .success {
             color: #00ff88;
         }
+        .withdraw-history {
+            margin-top: 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .withdraw-history h3 {
+            margin-bottom: 1rem;
+        }
+        .withdraw-history ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .withdraw-history li {
+            margin-bottom: 0.5rem;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>💰 Monetag Earning Bot</h1>
-            <p>Welcome, <span id="username">@EarningMaster</span></p>
+            <h1>💰Earnify💰</h1>
+            <p>Welcome, <span id="username">Just Test</span></p>
         </div>
         <div class="stats">
             <div class="stat-box">
@@ -148,6 +165,7 @@
             <button id="refer-btn" onclick="openReferModal()">👥 Refer & Earn</button>
         </div>
         <div class="withdraw-section" id="withdraw-section">
+            <h3>Withdraw Earnings</h3>
             <select id="method" class="form-input">
                 <option value="recharge">Mobile Recharge (Min. 1000 Coins = 20 TK)</option>
                 <option value="bkash">bKash (Min. 5000 Coins = 50 TK)</option>
@@ -156,6 +174,12 @@
             <input type="number" id="amount" class="form-input" placeholder="Enter amount in Coins">
             <button onclick="processWithdrawal()">Confirm Withdraw</button>
             <div id="withdraw-status"></div>
+        </div>
+        <div class="withdraw-history">
+            <h3>Withdrawal History</h3>
+            <ul id="withdraw-history-list">
+                <!-- Withdrawal history will be dynamically added here -->
+            </ul>
         </div>
         <div id="refer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10;">
             <div style="background: #fff; color: #000; padding: 2rem; border-radius: 10px; width: 90%; max-width: 400px; margin: 20% auto; text-align: center;">
@@ -182,6 +206,7 @@
         let earnings = 0;
         let autoMode = false;
         let progress = 0;
+        let withdrawalHistory = [];
 
         function updateStats() {
             document.getElementById('ads-count').textContent = adsWatched;
@@ -220,11 +245,7 @@
         }
 
         function showWithdraw() {
-            const section = document.getElementById('withdraw-section');
-            section.style.display = earnings >= 1000 ? 'block' : 'none';
-            if(earnings < 1000) {
-                alert('Minimum withdrawal is 1000 Coins!');
-            }
+            document.getElementById('withdraw-section').style.display = 'block';
         }
 
         async function processWithdrawal() {
@@ -249,15 +270,39 @@
             showStatus('Processing withdrawal...', 'processing');
             await new Promise(resolve => setTimeout(resolve, 2000));
 
-            // Send withdrawal request to admin via Telegram bot
-            sendToAdmin({
+            // Deduct coins
+            earnings -= amount;
+
+            // Add to withdrawal history
+            const withdrawal = {
+                id: Date.now(),
                 method: method,
                 amount: amount,
-                coins: amount,
+                status: 'Pending'
+            };
+            withdrawalHistory.push(withdrawal);
+            updateWithdrawalHistory();
+
+            // Send withdrawal request to admin via Telegram bot
+            sendToAdmin({
+                id: withdrawal.id,
+                method: method,
+                amount: amount,
                 username: document.getElementById('username').textContent
             });
 
             showStatus('Withdrawal request sent to admin. Please wait for approval.', 'success');
+            updateStats();
+        }
+
+        function updateWithdrawalHistory() {
+            const list = document.getElementById('withdraw-history-list');
+            list.innerHTML = '';
+            withdrawalHistory.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = `ID: ${item.id} | Method: ${item.method.toUpperCase()} | Amount: ${item.amount} Coins | Status: ${item.status}`;
+                list.appendChild(li);
+            });
         }
 
         function showStatus(message, type) {
@@ -285,6 +330,23 @@
             // Replace this with a real API call to detect user's country
             return "BD"; // For testing purposes, assume user is from Bangladesh
         }
+
+        // Simulate admin updating withdrawal status
+        function simulateAdminUpdate(id, status) {
+            const withdrawal = withdrawalHistory.find(item => item.id === id);
+            if (withdrawal) {
+                withdrawal.status = status;
+                updateWithdrawalHistory();
+            }
+        }
+
+        // Example: Simulate admin approving a withdrawal after 10 seconds
+        setTimeout(() => {
+            const lastWithdrawal = withdrawalHistory[withdrawalHistory.length - 1];
+            if (lastWithdrawal) {
+                simulateAdminUpdate(lastWithdrawal.id, 'Success');
+            }
+        }, 10000);
     </script>
 </body>
 </html>
