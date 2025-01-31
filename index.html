@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monetag Earning Bot - Bangladesh Only</title>
+    <title>Earnify - Earn Money</title>
     <style>
         * {
             box-sizing: border-box;
@@ -134,26 +134,36 @@
                 <h2 id="ads-count">0</h2>
             </div>
             <div class="stat-box">
-                <p>Earnings</p>
-                <h2>$<span id="earnings">0.00</span></h2>
+                <p>Earnings (Coins)</p>
+                <h2><span id="earnings">0</span> Coins</h2>
             </div>
         </div>
         <div class="progress-circle">
             <span id="progress-text">0%</span>
         </div>
         <div class="controls">
-            <button id="watch-btn" onclick="watchAd()">🎥 Watch Ad (+$0.10)</button>
+            <button id="watch-btn" onclick="watchAd()">🎥 Watch Ad (+20 Coins)</button>
             <button id="auto-btn" onclick="toggleAutoMode()">⚡ Auto Mode</button>
             <button id="withdraw-btn" onclick="showWithdraw()">💸 Withdraw Earnings</button>
+            <button id="refer-btn" onclick="openReferModal()">👥 Refer & Earn</button>
         </div>
         <div class="withdraw-section" id="withdraw-section">
             <select id="method" class="form-input">
-                <option value="bkash">bKash</option>
-                <option value="nagad">Nagad</option>
+                <option value="recharge">Mobile Recharge (Min. 1000 Coins = 20 TK)</option>
+                <option value="bkash">bKash (Min. 5000 Coins = 50 TK)</option>
+                <option value="nagad">Nagad (Min. 5000 Coins = 50 TK)</option>
             </select>
-            <input type="number" id="amount" class="form-input" placeholder="Enter amount">
+            <input type="number" id="amount" class="form-input" placeholder="Enter amount in Coins">
             <button onclick="processWithdrawal()">Confirm Withdraw</button>
             <div id="withdraw-status"></div>
+        </div>
+        <div id="refer-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10;">
+            <div style="background: #fff; color: #000; padding: 2rem; border-radius: 10px; width: 90%; max-width: 400px; margin: 20% auto; text-align: center;">
+                <h2>Refer & Earn</h2>
+                <p>Share your referral link with friends and earn 500 Coins for each successful referral!</p>
+                <input type="text" id="referral-link" value="https://monetag.com/?ref=YOUR_REF_CODE" readonly style="padding: 0.5rem; width: 100%; margin-bottom: 1rem;">
+                <button onclick="closeReferModal()">Close</button>
+            </div>
         </div>
     </div>
     <script>
@@ -175,7 +185,7 @@
 
         function updateStats() {
             document.getElementById('ads-count').textContent = adsWatched;
-            document.getElementById('earnings').textContent = earnings.toFixed(2);
+            document.getElementById('earnings').textContent = earnings;
             document.querySelector('.progress-circle').style.background = 
                 `conic-gradient(#00ff88 ${progress}%, rgba(0, 255, 136, 0.2) ${progress}%)`;
             document.getElementById('progress-text').textContent = `${progress}%`;
@@ -189,7 +199,7 @@
             await new Promise(resolve => setTimeout(resolve, 3000));
             
             adsWatched++;
-            earnings += 0.10;
+            earnings += 20;
             progress = (adsWatched % 10) * 10;
             updateStats();
             document.getElementById('watch-btn').disabled = false;
@@ -211,32 +221,43 @@
 
         function showWithdraw() {
             const section = document.getElementById('withdraw-section');
-            section.style.display = earnings >= 5 ? 'block' : 'none';
-            if(earnings < 5) {
-                alert('Minimum withdrawal amount is $5.00');
+            section.style.display = earnings >= 1000 ? 'block' : 'none';
+            if(earnings < 1000) {
+                alert('Minimum withdrawal is 1000 Coins!');
             }
         }
 
         async function processWithdrawal() {
             const method = document.getElementById('method').value;
-            const amount = parseFloat(document.getElementById('amount').value);
+            const amount = parseInt(document.getElementById('amount').value);
 
             if(amount > earnings) {
                 showStatus('Insufficient balance!', 'error');
                 return;
             }
 
-            if(amount < 5) {
-                showStatus('Minimum withdrawal is $5.00!', 'error');
+            if(method === "recharge" && amount < 1000) {
+                showStatus('Minimum 1000 Coins required for Mobile Recharge!', 'error');
+                return;
+            }
+
+            if((method === "bkash" || method === "nagad") && amount < 5000) {
+                showStatus('Minimum 5000 Coins required for bKash/Nagad!', 'error');
                 return;
             }
 
             showStatus('Processing withdrawal...', 'processing');
             await new Promise(resolve => setTimeout(resolve, 2000));
 
-            earnings -= amount;
-            updateStats();
-            showStatus(`Successfully withdrew $${amount.toFixed(2)} via ${method.toUpperCase()}!`, 'success');
+            // Send withdrawal request to admin via Telegram bot
+            sendToAdmin({
+                method: method,
+                amount: amount,
+                coins: amount,
+                username: document.getElementById('username').textContent
+            });
+
+            showStatus('Withdrawal request sent to admin. Please wait for approval.', 'success');
         }
 
         function showStatus(message, type) {
@@ -244,6 +265,19 @@
             status.textContent = message;
             status.className = type === 'error' ? 'error' : 
                                type === 'success' ? 'success' : '';
+        }
+
+        function openReferModal() {
+            document.getElementById('refer-modal').style.display = 'block';
+        }
+
+        function closeReferModal() {
+            document.getElementById('refer-modal').style.display = 'none';
+        }
+
+        function sendToAdmin(data) {
+            // Replace with actual Telegram bot API call
+            console.log("Withdrawal Request Sent to Admin:", data);
         }
 
         function getUserCountry() {
