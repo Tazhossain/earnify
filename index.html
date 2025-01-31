@@ -5,12 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="monetag" content="">
     <title>Earnify - Earn Rewards</title>
+    <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            document.querySelector('meta[name="monetag"]').setAttribute("content", settings.monetag);
-        });
-    </script>
 </head>
 <body>
     <div class="container">
@@ -18,20 +14,31 @@
             <h1>💰 Earnify</h1>
             <p>Welcome, <span id="username">@cybertaz</span></p>
         </div>
+
         <div class="stats">
             <div class="stat-box">
                 <p>Watched Ads</p>
                 <h2 id="ads-count">0</h2>
             </div>
             <div class="stat-box">
-                <p>Earnings (Coins)</p>
+                <p>Earnings</p>
                 <h2><span id="earnings">0</span> Coins</h2>
             </div>
         </div>
-        <button id="watch-btn" onclick="watchAd()">🎥 Watch Ad (+20 Coins)</button>
-        <button id="withdraw-btn" onclick="showWithdrawSection()">💸 Withdraw</button>
-        <button onclick="location.href='admin.html'">🔧 Admin Panel</button>
+
+        <div class="actions">
+            <button id="watch-btn" onclick="watchAd()">
+                🎥 Watch Ad (+20 Coins)
+            </button>
+            <button id="withdraw-btn" onclick="showWithdrawSection()">
+                💸 Withdraw Earnings
+            </button>
+            <button onclick="location.href='admin.html'">
+                🔧 Admin Panel
+            </button>
+        </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
