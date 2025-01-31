@@ -4,15 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="monetag" content="">
-    <title>Earnify - Earn Rewards</title>
+    <title>Earnify - Telegram Earn Bot</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="config.js"></script>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>💰 Earnify</h1>
-            <p>Welcome, <span id="username">@cybertaz</span></p>
+            <img id="user-profile-pic" src="https://cdn-icons-png.flaticon.com/512/149/149071.png" 
+                 class="profile-pic" alt="Profile">
+            <div>
+                <h1>Auto MoneTag Ads</h1>
+                <p>Welcome, <span id="username">@user</span></p>
+            </div>
         </div>
 
         <div class="stats">
@@ -21,24 +26,38 @@
                 <h2 id="ads-count">0</h2>
             </div>
             <div class="stat-box">
-                <p>Earnings</p>
-                <h2><span id="earnings">0</span> Coins</h2>
+                <p>Earned Points</p>
+                <h2><span id="earnings">0.00</span></h2>
             </div>
         </div>
 
+        <div class="progress">
+            <div class="progress-bar" style="width: 0%"></div>
+        </div>
+
         <div class="actions">
-            <button id="watch-btn" onclick="watchAd()">
-                🎥 Watch Ad (+20 Coins)
-            </button>
-            <button id="withdraw-btn" onclick="showWithdrawSection()">
+            <label class="action-item">
+                <input type="checkbox" id="watch-ad" onclick="handleAdAction()">
+                <span>Watch Ad</span>
+            </label>
+            
+            <label class="action-item">
+                <input type="checkbox" id="auto-ads">
+                <span>Auto Show Ads</span>
+            </label>
+
+            <label class="action-item">
+                <input type="checkbox" id="stop-ads">
+                <span>Stop Auto Ads</span>
+            </label>
+
+            <button class="withdraw-btn" onclick="handleWithdraw()">
                 💸 Withdraw Earnings
-            </button>
-            <button onclick="location.href='admin.html'">
-                🔧 Admin Panel
             </button>
         </div>
     </div>
 
+    <script src="telegram-auth.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
