@@ -19,3 +19,39 @@ document.addEventListener("DOMContentLoaded", () => {
             );
         });
 });
+
+function updateAdminDashboard(data) {
+    // Update statistics
+    document.getElementById('active-users').textContent = data.activeUsers;
+    document.getElementById('total-earnings').textContent = `$${data.totalEarnings.toFixed(2)}`;
+    document.getElementById('daily-earnings').textContent = `$${data.dailyEarnings.toFixed(2)}`;
+    document.getElementById('total-ads').textContent = data.totalAds;
+    
+    // Update activities
+    const activitiesList = document.getElementById('activities-list');
+    activitiesList.innerHTML = data.activities.map(activity => `
+        <div class="activity-item">
+            <span class="activity-time">[${new Date(activity.timestamp).toLocaleTimeString()}]</span>
+            <span class="activity-text">${activity.description}</span>
+        </div>
+    `).join('');
+    
+    // Update last updated time
+    document.getElementById('last-updated').textContent = new Date().toLocaleString();
+}
+
+function showAdminError(error) {
+    const activitiesList = document.getElementById('activities-list');
+    activitiesList.innerHTML = `
+        <div class="error">
+            ❌ Error loading data: ${error.message}
+        </div>
+    `;
+}
+
+// Initial call if needed
+document.addEventListener("DOMContentLoaded", () => {
+    if(document.getElementById('admin-panel').style.display === 'block') {
+        loadAdminData();
+    }
+});
