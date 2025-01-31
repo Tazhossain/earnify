@@ -3,29 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Earnify Admin Panel</title>
+    <title>Admin Panel - Earnify</title>
     <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
 </head>
 <body>
     <div class="container">
-        <div class="admin-panel">
-            <h2>Admin Dashboard</h2>
+        <!-- Login Form -->
+        <div id="login-form" class="admin-login">
+            <div class="admin-auth-box">
+                <h2>🔒 Admin Authentication</h2>
+                <input type="password" id="admin-pass" placeholder="Enter Admin Password" class="admin-input">
+                <button onclick="checkAdminPassword()" class="auth-button">
+                    🔑 Login
+                </button>
+            </div>
+        </div>
+
+        <!-- Admin Panel Content -->
+        <div id="admin-panel" class="admin-panel" style="display: none;">
+            <div class="admin-header">
+                <h2>🛠️ Earnify Control Center</h2>
+                <p>Last Updated: <span id="last-updated">Loading...</span></p>
+            </div>
+
             <div class="stats">
-                <div class="stat-box">
-                    <p>Active Users</p>
+                <div class="stat-box critical">
+                    <p>🟢 Active Users</p>
                     <h2 id="active-users">0</h2>
                 </div>
-                <div class="stat-box">
-                    <p>Total Earnings</p>
+                <div class="stat-box warning">
+                    <p>💰 Total Earnings</p>
                     <h2 id="total-earnings">0</h2>
                 </div>
+                <div class="stat-box success">
+                    <p>📈 Today's Earnings</p>
+                    <h2 id="daily-earnings">0</h2>
+                </div>
+                <div class="stat-box info">
+                    <p>📊 Total Ads Served</p>
+                    <h2 id="total-ads">0</h2>
+                </div>
             </div>
-            <button onclick="location.href='index.html'">
-                🏠 Return to Home
-            </button>
+
+            <div class="admin-actions">
+                <button onclick="refreshStats()" class="refresh-btn">
+                    🔄 Refresh Statistics
+                </button>
+                <button onclick="location.href='index.html'" class="home-btn">
+                    🏠 Return to Home
+                </button>
+            </div>
+
+            <div class="data-table">
+                <h3>📋 Recent Activities</h3>
+                <div id="activities-list" class="activities">
+                    <div class="loading">Loading activities...</div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script>
+        function checkAdminPassword() {
+            const enteredPass = document.getElementById('admin-pass').value;
+            const storedPass = settings.adminPassword;
+            
+            if(enteredPass === storedPass) {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'block';
+                loadAdminData();
+            } else {
+                alert('❌ Invalid admin password!');
+                document.getElementById('admin-pass').value = '';
+            }
+        }
+
+        function loadAdminData() {
+            // Initial data load
+            fetch(settings.apiBaseUrl + "/admin/stats")
+                .then(response => response.json())
+                .then(data => updateAdminDashboard(data))
+                .catch(error => showAdminError(error));
+        }
+
+        function refreshStats() {
+            document.getElementById('activities-list').innerHTML = '<div class="loading">Refreshing data...</div>';
+            loadAdminData();
+        }
+    </script>
     <script src="admin.js"></script>
 </body>
 </html>
