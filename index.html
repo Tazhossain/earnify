@@ -8,50 +8,45 @@
     <link rel="stylesheet" href="style.css">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="config.js"></script>
+    <!-- MoneTag Ads Script -->
+    <script src="//s.monetag.com/4e286c0f693c0db40ba5a1fbad04e921.js"></script>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <img id="user-profile-pic" src="placeholder.png" class="profile-pic" alt="Profile">
-            <div class="user-info">
+        <div class="profile-section">
+            <img id="user-profile-pic" src="default-profile.png" class="profile-pic">
+            <div>
                 <h1>Auto MoneTag Ads</h1>
                 <p>Welcome, <span id="username">@user</span></p>
             </div>
         </div>
 
-        <div class="stats">
-            <div class="stat-box">
+        <div class="stats-grid">
+            <div class="stat-card">
                 <p>Watched Ads</p>
                 <h2 id="ads-count">0</h2>
             </div>
-            <div class="stat-box">
+            <div class="stat-card">
                 <p>Earned Points</p>
                 <h2 id="earnings">0.00</h2>
             </div>
         </div>
 
-        <div class="progress">
-            <div class="progress-bar" style="width: 0%"></div>
-        </div>
-
-        <div class="actions">
-            <label class="action-item">
-                <input type="checkbox" id="watch-ad" onclick="handleAdAction()">
-                <span>📺 Watch Ad</span>
-            </label>
+        <div class="ad-controls">
+            <button class="ad-button" onclick="watchAd()">
+                📺 Watch Ad (+20 Points)
+            </button>
             
-            <label class="action-item">
-                <input type="checkbox" id="auto-ads" onclick="toggleAutoAds()">
-                <span>⚡ Auto Show Ads</span>
-            </label>
+            <button class="ad-button" onclick="toggleAutoAds()">
+                ⚡ Auto Show Ads
+            </button>
 
-            <button class="withdraw-btn" onclick="handleWithdraw()">
+            <button class="ad-button" onclick="handleWithdraw()">
                 💸 Withdraw Earnings
             </button>
         </div>
     </div>
 
-    <script src="telegram-auth.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
