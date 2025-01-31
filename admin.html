@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earnify Admin Panel</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        body {
+            background: #f0f2f5;
+            color: #1a1a1e;
+        }
+        .login-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .admin-panel {
+            display: none;
+            padding: 2rem;
+        }
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .withdrawals, .users-list {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 0.5rem;
+        }
+        .approve-btn {
+            background: #4CAF50;
+            color: white;
+        }
+        .reject-btn {
+            background: #f44336;
+            color: white;
+        }
+        .ban-btn {
+            background: #ff9800;
+            color: white;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .login-btn {
+            background: #2196F3;
+            color: white;
+            width: 100%;
+        }
+        .clear-data-btn {
+            background: #f44336;
+            color: white;
+            margin-top: 1rem;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            gap: 1rem;
+        }
+        .tab {
+            padding: 0.5rem 1rem;
+            background: #eee;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .tab.active {
+            background: #2196F3;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="login-section">
+        <div class="login-form">
+            <h2>Admin Login</h2>
+            <input type="text" id="admin-username" placeholder="Username">
+            <input type="password" id="admin-password" placeholder="Password">
+            <button class="login-btn" onclick="login()">Login</button>
+        </div>
+    </div>
+
+    <div class="admin-panel" id="admin-section">
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('dashboard')">Dashboard</div>
+            <div class="tab" onclick="showTab('withdrawals')">Withdrawals</div>
+            <div class="tab" onclick="showTab('users')">Users</div>
+            <div class="tab" onclick="showTab('settings')">Settings</div>
+        </div>
+
+        <div id="dashboard-tab">
+            <div class="dashboard">
+                <div class="stat-card">
+                    <h3>Active Users</h3>
+                    <p id="active-users">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Earnings</h3>
+                    <p id="total-earnings">0 Coins</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Pending Withdrawals</h3>
+                    <p id="pending-withdrawals">0</p>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Paid</h3>
+                    <p id="total-paid">0 Coins</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="withdrawals-tab" style="display: none;">
+            <div class="withdrawals">
+                <h2>Withdrawal Requests</h2>
+                <table id="withdrawals-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Number</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawals-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="users-tab" style="display: none;">
+            <div class="users-list">
+                <h2>User Management</h2>
+                <table id="users-table">
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Total Earnings</th>
+                            <th>Ads Watched</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-list"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="settings-tab" style="display: none;">
+            <div class="stat-card">
+                <h2>System Settings</h2>
+                <button class="clear-data-btn" onclick="clearAllData()">Clear All Data</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_USERNAME = 'admin';
+        const ADMIN_PASSWORD = 'admin123';
+        let activeUsers = [];
+        let withdrawalRequests = [];
+
+        function login() {
+            const username = document.getElementById('admin-username').value;
+            const password = document.getElementById('admin-password').value;
+
+            if(username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('admin-section').style.display = 'block';
+                loadDashboard();
+            } else {
+                alert('Invalid credentials!');
+            }
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelector(`.tab:nth-child(${['dashboard', 'withdrawals', 'users', 'settings'].indexOf(tabName) + 1})`).classList.add('active');
+            
+            ['dashboard-tab', 'withdrawals-tab', 'users-tab', 'settings-tab'].forEach(tab => {
+                document.getElementById(tab).style.display = 'none';
+            });
+            document.getElementById(`${tabName}-tab`).style.display = 'block';
+
+            if(tabName === 'withdrawals') loadWithdrawals();
+            if(tabName === 'users') loadUsers();
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/adminStats');
+                const stats = await response.json();
+                
+                document.getElementById('active-users').textContent = stats.activeUsers;
+                document.getElementById('total-earnings').textContent = `${stats.totalEarnings} Coins`;
+                document.getElementById('pending-withdrawals').textContent = stats.pendingWithdrawals;
+                document.getElementById('total-paid').textContent = `${stats.totalPaid} Coins`;
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+            }
+        }
+
+        async function loadWithdrawals() {
+            try {
+                const response = await fetch('/api/adminWithdrawals');
+                withdrawalRequests = await response.json();
+                
+                const tbody = document.getElementById('withdrawals-list');
+                tbody.innerHTML = '';
+                
+                withdrawalRequests.forEach(request => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${request.username}</td>
+                        <td>${request.amount} Coins</td>
+                        <td>${request.method}</td>
+                        <td>${request.paymentNumber}</td>
+                        <td>${request.status}</td>
+                        <td>
+                            ${request.status === 'Pending' ? `
+                                <button class="approve-btn" onclick="processWithdrawal('${request.id}', 'approve')">Approve</button>
+                                <button class="reject-btn" onclick="processWithdrawal('${request.id}', 'reject')">Reject</button>
+                            ` : ''}
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading withdrawals:', error);
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/adminUsers');
+                activeUsers = await response.json();
+                
+                const tbody = document.getElementById('users-list');
+                tbody.innerHTML = '';
+                
+                activeUsers.forEach(user => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${user.username}</td>
+                        <td>${user.earnings} Coins</td>
+                        <td>${user.adsWatched}</td>
+                        <td>${user.banned ? 'Banned' : 'Active'}</td>
+                        <td>
+                            <button class="ban-btn" onclick="toggleBanUser('${user.username}')">
+                                ${user.banned ? 'Unban' : 'Ban'} User
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        async function processWithdrawal(id, action) {
+            try {
+                const response = await fetch('/api/processWithdrawal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, action })
+                });
+                
+                const result = await response.json();
+                if(result.success) {
+                    loadWithdrawals();
+                    loadDashboard();
+                } else {
+                    alert('Failed to process withdrawal');
+                }
+            } catch (error) {
+                console.error('Error processing withdrawal:', error);
+                alert('Network error');
+            }
+        }
+
+        async function toggleBanUser(username) {
+            try {
+                const response = await fetch('/api/toggleBanUser', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                
+                const result = await response.json();
+                if(result.success) {
+                    loadUsers();
+                } else {
+                    alert('Failed to update user status');
+                }
+            } catch (error) {
+                console.error('Error updating user status:', error);
+                alert('Network error');
+            }
+        }
+
+        async function clearAllData() {
+            if(confirm('Are you sure you want to clear all data? This action cannot be undone.')) {
+                try {
+                    const response = await fetch('/api/clearAllData', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    
+                    const result = await response.json();
+                    if(result.success) {
+                        alert('All data cleared successfully');
+                        loadDashboard();
+                    } else {
+                        alert('Failed to clear data');
+                    }
+                } catch (error) {
+                    console.error('Error clearing data:', error);
+                    alert('Network error');
+                }
+            }
+        }
+
+        setInterval(loadDashboard, 30000);
+    </script>
+</body>
+</html>
