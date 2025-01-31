@@ -4,14 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Earnify Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
     <script src="config.js"></script>
 </head>
 <body>
-    <div class="admin-panel">
-        <h2>Admin Dashboard</h2>
-        <p>Active Users: <span id="active-users">0</span></p>
-        <p>Total Earnings: <span id="total-earnings">0</span> Coins</p>
-        <button onclick="location.href='index.html'">🏠 Home</button>
+    <div class="container">
+        <div class="admin-panel">
+            <h2>Admin Dashboard</h2>
+            <div class="stats">
+                <div class="stat-box">
+                    <p>Active Users</p>
+                    <h2 id="active-users">0</h2>
+                </div>
+                <div class="stat-box">
+                    <p>Total Earnings</p>
+                    <h2 id="total-earnings">0</h2>
+                </div>
+            </div>
+            <button onclick="location.href='index.html'">
+                🏠 Return to Home
+            </button>
+        </div>
     </div>
     <script src="admin.js"></script>
 </body>
