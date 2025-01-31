@@ -14,6 +14,11 @@ body {
     padding: 15px;
 }
 
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
 .header {
     display: flex;
     align-items: center;
@@ -25,7 +30,23 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
+    border: 2px solid var(--primary);
     object-fit: cover;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.stat-box {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .actions {
@@ -61,19 +82,30 @@ body {
 .withdraw-btn {
     width: 100%;
     background: #3498DB;
-    justify-content: center;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
     margin-top: 20px;
 }
 
-/* Admin Specific Styles */
-.admin-auth-box {
+/* Admin Panel Styles */
+.admin-login {
     background: var(--card-bg);
     padding: 2rem;
-    border-radius: 15px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    border-radius: 12px;
     max-width: 400px;
-    margin: 5rem auto;
+    margin: 2rem auto;
     text-align: center;
+}
+
+.admin-panel {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: 12px;
+    margin: 2rem auto;
 }
 
 .admin-input {
@@ -84,41 +116,3 @@ body {
     border-radius: 8px;
     font-size: 16px;
 }
-
-.auth-button {
-    background: #2ecc71;
-    width: 100%;
-    padding: 15px;
-    font-size: 1.1rem;
-}
-
-.admin-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-.data-table {
-    background: var(--card-bg);
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin-top: 2rem;
-}
-
-.activities {
-    margin-top: 1rem;
-    min-height: 200px;
-}
-
-.refresh-btn {
-    background: #3498db;
-    margin-right: 10px;
-}
-
-.home-btn {
-    background: #95a5a6;
-}
-
-.stat-box.critical { border-left: 4px solid #e74c3c; }
-.stat-box.warning { border-left: 4px solid #f1c40f; }
-.stat-box.success { border-left: 4px solid #2ecc71; }
-.stat-box.info { border-left: 4px solid #3498db; }
