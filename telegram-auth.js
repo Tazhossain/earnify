@@ -1,16 +1,13 @@
-// Handle Telegram Web App integration
+// Handle Telegram WebApp initialization
 document.addEventListener("DOMContentLoaded", () => {
     if (window.Telegram?.WebApp) {
+        Telegram.WebApp.ready();
         const user = Telegram.WebApp.initDataUnsafe.user;
-        
-        // Update user info
-        if(user) {
-            document.getElementById('user-profile-pic').src = user.photo_url;
+        if (user) {
             document.getElementById('username').textContent = `@${user.username}`;
-            Telegram.WebApp.ready();
+            if (user.photo_url) {
+                document.getElementById('user-profile-pic').src = user.photo_url;
+            }
         }
-        
-        // Expand the app to full view
-        Telegram.WebApp.expand();
     }
 });
